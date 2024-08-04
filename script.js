@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const boardSize = 4;
+    const defaultSize = 4;
     const board = document.getElementById('boggle-board');
     const wordInput = document.getElementById('word-input');
     const submitButton = document.getElementById('submit-word');
@@ -7,13 +7,19 @@ document.addEventListener("DOMContentLoaded", () => {
     const scoreDisplay = document.getElementById('score');
     const wordListDisplay = document.getElementById('word-list');
     const timerDisplay = document.getElementById('timer');
+    const boardSizeSelect = document.getElementById('board-size');
+    const timerLengthInput = document.getElementById('timer-length');
     
     let score = 0;
+    let boardSize = parseInt(boardSizeSelect.value);
     let boardLetters = [];
     let wordsFound = new Set();
     let timer;
-    let timeLeft = 60;
+    let timeLeft;
     let selectedCells = [];
+    
+    // Dictionary of valid words (sample)
+    const dictionary = new Set(['CAT', 'DOG', 'BAT', 'RAT', 'CAR', 'CARD', 'CART', 'CARGO']);
 
     // Generate random letters
     function generateRandomLetter() {
@@ -35,12 +41,12 @@ document.addEventListener("DOMContentLoaded", () => {
             cell.addEventListener('click', handleCellClick);
             board.appendChild(cell);
         }
+        board.style.gridTemplateColumns = `repeat(${boardSize}, 50px)`;
     }
 
-    // Check if word is valid (basic word search)
+    // Check if word is valid
     function checkWord(word) {
-        word = word.toUpperCase();
-        return boardLetters.join('').includes(word);
+        return dictionary.has(word.toUpperCase());
     }
 
     // Highlight the cells part of the word
@@ -79,7 +85,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 alert('Word already found.');
             }
         } else {
-            alert('Invalid word. Ensure it is at least 3 letters long and exists on the board.');
+            alert('Invalid word. Ensure it is at least 3 letters long and a valid word.');
         }
         wordInput.value = '';
         selectedCells = [];
@@ -88,6 +94,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Timer countdown
     function startTimer() {
+        timeLeft = parseInt(timerLengthInput.value);
+        timerDisplay.textContent = `Time Left: ${timeLeft}`;
         timer = setInterval(() => {
             timeLeft--;
             timerDisplay.textContent = `Time Left: ${timeLeft}`;
@@ -101,7 +109,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Reset game
     function resetGame() {
         clearInterval(timer);
-        timeLeft = 60;
+        timeLeft = parseInt(timerLengthInput.value);
         timerDisplay.textContent = `Time Left: ${timeLeft}`;
         score = 0;
         wordsFound = new Set();
@@ -109,15 +117,18 @@ document.addEventListener("DOMContentLoaded", () => {
         wordListDisplay.textContent = 'Words Found: ';
         wordInput.value = '';
         selectedCells = [];
+        boardSize = parseInt(boardSizeSelect.value);
         createBoard();
         startTimer();
     }
 
-    // Initialize the board and timer
-    createBoard();
-    startTimer();
-
     // Event listeners
     submitButton.addEventListener('click', handleWordSubmit);
     resetButton.addEventListener('click', resetGame);
+    boardSizeSelect.addEventListener('change', resetGame);
+    timerLengthInput.addEventListener('change', resetGame);
+
+    // Initialize the board and timer
+    createBoard();
+    startTimer();
 });
