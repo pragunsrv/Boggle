@@ -27,15 +27,20 @@ body {
     background-color: yellow;
 }
 
+.boggle-cell.path {
+    background-color: lightblue;
+}
+
 #word-input {
     margin: 20px;
     padding: 10px;
     font-size: 16px;
 }
 
-#submit-word {
+#submit-word, #reset-game {
     padding: 10px;
     font-size: 16px;
+    margin: 5px;
 }
 
 #score {
