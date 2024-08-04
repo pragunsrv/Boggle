@@ -17,9 +17,18 @@ document.addEventListener("DOMContentLoaded", () => {
     let timer;
     let timeLeft;
     let selectedCells = [];
-    
-    // Dictionary of valid words (sample)
-    const dictionary = new Set(['CAT', 'DOG', 'BAT', 'RAT', 'CAR', 'CARD', 'CART', 'CARGO']);
+    let dictionary = new Set();
+
+    // Fetch dictionary data
+    async function fetchDictionary() {
+        try {
+            const response = await fetch('path/to/your/wordlist.txt');
+            const text = await response.text();
+            dictionary = new Set(text.split('\n').map(word => word.trim().toUpperCase()));
+        } catch (error) {
+            console.error('Error fetching dictionary:', error);
+        }
+    }
 
     // Generate random letters
     function generateRandomLetter() {
@@ -78,8 +87,9 @@ document.addEventListener("DOMContentLoaded", () => {
         if (word.length >= 3 && checkWord(word)) {
             if (!wordsFound.has(word)) {
                 wordsFound.add(word);
-                score += 10 + word.length - 3;  // Bonus for word length
-                scoreDisplay.textContent = `Score: ${score}`;
+                // Scoring with multiplier: 10 points per letter
+                score += (10 + word.length - 3) * 1.5; // 1.5x multiplier
+                scoreDisplay.textContent = `Score: ${Math.round(score)}`;
                 wordListDisplay.textContent = `Words Found: ${Array.from(wordsFound).join(', ')}`;
             } else {
                 alert('Word already found.');
@@ -122,13 +132,14 @@ document.addEventListener("DOMContentLoaded", () => {
         startTimer();
     }
 
+    // Initialize the board and timer
+    createBoard();
+    startTimer();
+    fetchDictionary();
+
     // Event listeners
     submitButton.addEventListener('click', handleWordSubmit);
     resetButton.addEventListener('click', resetGame);
     boardSizeSelect.addEventListener('change', resetGame);
     timerLengthInput.addEventListener('change', resetGame);
-
-    // Initialize the board and timer
-    createBoard();
-    startTimer();
 });
