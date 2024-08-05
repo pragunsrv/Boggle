@@ -108,3 +108,24 @@ body.dark {
 .boggle-cell.dark {
     background-color: darkgrey;
 }
+/* Existing styles ... */
+
+#ar-section {
+    margin-top: 20px;
+}
+
+#tutorial-section {
+    margin-top: 20px;
+    text-align: left;
+}
+
+#tutorial-content {
+    margin: 10px auto;
+    text-align: left;
+}
+
+#ar-section, #tutorial-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}

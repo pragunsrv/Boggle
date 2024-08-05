@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Boggle Game - Version 11</title>
+    <title>Boggle Game - Version 12</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Boggle Game - Version 11</h1>
+    <h1>Boggle Game - Version 12</h1>
 
     <div id="auth-section">
         <h2>Login</h2>
@@ -65,6 +65,13 @@
         <div id="lobby-list"></div>
     </div>
 
+    <div id="game-modes-section" style="display: none;">
+        <h2>Select Game Mode</h2>
+        <button id="speed-challenge">Speed Challenge</button>
+        <button id="endless-mode">Endless Mode</button>
+        <button id="custom-challenges">Custom Challenges</button>
+    </div>
+
     <div id="boggle-board"></div>
     <input type="text" id="word-input" placeholder="Enter word">
     <button id="submit-word">Submit</button>
@@ -95,6 +102,20 @@
         <div id="player1-score">Player 1 Score: 0</div>
         <div id="player2-score">Player 2 Score: 0</div>
         <div id="current-player">Current Player: Player 1</div>
+    </div>
+
+    <div id="ar-section" style="display: none;">
+        <h2>AR Mode</h2>
+        <button id="start-ar">Start AR View</button>
+    </div>
+
+    <div id="tutorial-section" style="display: none;">
+        <h2>Game Tutorial</h2>
+        <div id="tutorial-content">
+            <p>Welcome to Boggle! Here's how to play...</p>
+            <!-- Detailed tutorial content goes here -->
+        </div>
+        <button id="close-tutorial">Close Tutorial</button>
     </div>
 
     <script src="script.js"></script>

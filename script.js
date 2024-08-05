@@ -35,6 +35,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const fontColorInput = document.getElementById('font-color');
     const cellSizeInput = document.getElementById('cell-size');
     const themeSwitch = document.getElementById('theme-switch');
+    const gameModesSection = document.getElementById('game-modes-section');
+    const speedChallengeButton = document.getElementById('speed-challenge');
+    const endlessModeButton = document.getElementById('endless-mode');
+    const customChallengesButton = document.getElementById('custom-challenges');
+    const arSection = document.getElementById('ar-section');
+    const startARButton = document.getElementById('start-ar');
+    const tutorialSection = document.getElementById('tutorial-section');
+    const closeTutorialButton = document.getElementById('close-tutorial');
 
     let boardSize = 4;
     let timeLimit = 60;
@@ -57,6 +65,9 @@ document.addEventListener("DOMContentLoaded", () => {
     let currentPlayer = 1;
     let playerQueue = [];
     let aiWords = [];
+    let chatMessages = [];
+    let highScores = JSON.parse(localStorage.getItem('highScores')) || [];
+    let leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || [];
 
     // Fetch dictionary from a text file or online source
     function fetchDictionary() {
@@ -323,8 +334,9 @@ document.addEventListener("DOMContentLoaded", () => {
             settingsSection.style.display = 'block';
             chatSection.style.display = 'block';
             multiplayerSection.style.display = 'block';
-            highscoresSection.style.display = 'block';
-            leaderboardSection.style.display = 'block';
+            gameModesSection.style.display = 'block';
+            arSection.style.display = 'block';
+            tutorialSection.style.display = 'block';
             loadUserStats();
             createBoard();
             startTimer();
@@ -342,8 +354,9 @@ document.addEventListener("DOMContentLoaded", () => {
         settingsSection.style.display = 'none';
         chatSection.style.display = 'none';
         multiplayerSection.style.display = 'none';
-        highscoresSection.style.display = 'none';
-        leaderboardSection.style.display = 'none';
+        gameModesSection.style.display = 'none';
+        arSection.style.display = 'none';
+        tutorialSection.style.display = 'none';
         resetGame();
     }
 
@@ -443,6 +456,31 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    // AR mode
+    function startAR() {
+        // Example code for AR
+        alert('AR Mode is not implemented. This is a placeholder.');
+    }
+
+    // Handle game mode selection
+    function handleGameModeSelection(mode) {
+        switch (mode) {
+            case 'speed-challenge':
+                boardSize = 4;
+                timeLimit = 30;
+                break;
+            case 'endless-mode':
+                boardSize = 5;
+                timeLimit = Infinity;
+                break;
+            case 'custom-challenges':
+                // Custom challenges implementation
+                alert('Custom Challenges is a placeholder.');
+                return;
+        }
+        resetGame();
+    }
+
     // Event listeners
     submitButton.addEventListener('click', handleWordSubmit);
     resetButton.addEventListener('click', resetGame);
@@ -455,6 +493,11 @@ document.addEventListener("DOMContentLoaded", () => {
     startMultiplayerButton.addEventListener('click', handleMultiplayerStart);
     createLobbyButton.addEventListener('click', handleLobbyCreation);
     joinLobbyButton.addEventListener('click', handleLobbyJoin);
+    startARButton.addEventListener('click', startAR);
+    speedChallengeButton.addEventListener('click', () => handleGameModeSelection('speed-challenge'));
+    endlessModeButton.addEventListener('click', () => handleGameModeSelection('endless-mode'));
+    customChallengesButton.addEventListener('click', () => handleGameModeSelection('custom-challenges'));
+    closeTutorialButton.addEventListener('click', () => tutorialSection.style.display = 'none');
 
     // Initial setup
     fetchDictionary();
