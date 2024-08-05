@@ -37,7 +37,7 @@ body {
     font-size: 16px;
 }
 
-#submit-word, #reset-game, #hint-button {
+#submit-word, #reset-game, #hint-button, #send-chat, #start-multiplayer {
     padding: 10px;
     font-size: 16px;
     margin: 5px;
@@ -68,8 +68,17 @@ input[type="number"], select, input[type="text"], input[type="checkbox"] {
     margin: 5px;
 }
 
-#auth-section, #user-section, #profile-section, #difficulty-section, #highscores-section, #leaderboard-section {
+#auth-section, #user-section, #profile-section, #difficulty-section, #highscores-section, #leaderboard-section, #chat-section, #multiplayer-section {
     margin: 20px;
+}
+
+#chat-window {
+    border: 1px solid #ccc;
+    height: 200px;
+    width: 300px;
+    overflow-y: auto;
+    margin: 10px auto;
+    padding: 5px;
 }
 
 body.light {

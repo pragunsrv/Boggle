@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Boggle Game - Version 7</title>
+    <title>Boggle Game - Version 9</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Boggle Game - Version 7</h1>
+    <h1>Boggle Game - Version 9</h1>
 
     <div id="auth-section">
         <h2>Login</h2>
@@ -45,6 +45,24 @@
         <input type="checkbox" id="sound-toggle">
     </div>
 
+    <div id="daily-challenge-section" style="display: none;">
+        <h2>Daily Challenge</h2>
+        <p>Complete the daily puzzle and earn rewards!</p>
+        <button id="start-daily-challenge">Start Daily Challenge</button>
+    </div>
+
+    <div id="achievements-section" style="display: none;">
+        <h2>Achievements</h2>
+        <ul id="achievements-list"></ul>
+    </div>
+
+    <div id="statistics-section" style="display: none;">
+        <h2>Game Statistics</h2>
+        <p>Total Games Played: <span id="total-games">0</span></p>
+        <p>Total Words Found: <span id="total-words">0</span></p>
+        <p>Average Score: <span id="average-score">0</span></p>
+    </div>
+
     <div id="boggle-board"></div>
     <input type="text" id="word-input" placeholder="Enter word">
     <button id="submit-word">Submit</button>
@@ -55,13 +73,3 @@
     <div id="timer">Time Left: 60</div>
     <div id="highscores-section" style="display: none;">
         <h2>High Scores</h2>
-        <ul id="highscores-list"></ul>
-    </div>
-    <div id="leaderboard-section" style="display: none;">
-        <h2>Global Leaderboard</h2>
-        <ul id="leaderboard-list"></ul>
-    </div>
-    
-    <script src="script.js"></script>
-</body>
-</html>

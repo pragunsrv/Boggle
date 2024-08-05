@@ -25,6 +25,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const settingsSection = document.getElementById('settings-section');
     const highscoresSection = document.getElementById('highscores-section');
     const leaderboardSection = document.getElementById('leaderboard-section');
+    const chatSection = document.getElementById('chat-section');
+    const chatWindow = document.getElementById('chat-window');
+    const chatInput = document.getElementById('chat-input');
+    const sendChatButton = document.getElementById('send-chat');
+    const multiplayerSection = document.getElementById('multiplayer-section');
+    const startMultiplayerButton = document.getElementById('start-multiplayer');
     
     let score = 0;
     let boardSize = 4;
@@ -37,6 +43,11 @@ document.addEventListener("DOMContentLoaded", () => {
     let currentUser = null;
     let highScores = JSON.parse(localStorage.getItem('highScores')) || [];
     let leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || [];
+    let multiplayer = false;
+    let player1Score = 0;
+    let player2Score = 0;
+    let currentPlayer = 1;
+    let chatMessages = [];
 
     // Fetch dictionary data
     async function fetchDictionary() {
@@ -50,43 +61,41 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Generate random letters
-    function generateRandomLetter() {
+    function generateRandomLetters(size) {
         const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        return letters.charAt(Math.floor(Math.random() * letters.length));
+        return Array.from({ length: size * size }, () => letters[Math.floor(Math.random() * letters.length)]);
     }
 
-    // Create the Boggle board
+    // Create Boggle board
     function createBoard() {
         board.innerHTML = '';
-        boardLetters = [];
-        for (let i = 0; i < boardSize * boardSize; i++) {
-            const letter = generateRandomLetter();
-            boardLetters.push(letter);
+        board.style.gridTemplateColumns = `repeat(${boardSize}, 50px)`;
+        boardLetters = generateRandomLetters(boardSize);
+        boardLetters.forEach((letter, index) => {
             const cell = document.createElement('div');
-            cell.classList.add('boggle-cell');
+            cell.className = 'boggle-cell';
             cell.textContent = letter;
-            cell.dataset.index = i;
+            cell.dataset.index = index;
             cell.addEventListener('click', handleCellClick);
             board.appendChild(cell);
-        }
-        board.style.gridTemplateColumns = `repeat(${boardSize}, 50px)`;
+        });
     }
 
-    // Check if word is valid
+    // Check if the word is valid
     function checkWord(word) {
         return dictionary.has(word.toUpperCase());
     }
 
-    // Highlight the cells part of the word
-    function highlightCells(indices, path = false) {
+    // Highlight selected cells
+    function highlightCells(cells, clear = false) {
         document.querySelectorAll('.boggle-cell').forEach(cell => {
-            const index = parseInt(cell.dataset.index);
-            if (indices.includes(index)) {
-                cell.classList.add(path ? 'path' : 'highlight');
-            } else {
-                cell.classList.remove('highlight', 'path');
-            }
+            cell.classList.remove('highlight');
         });
+        if (!clear) {
+            cells.forEach(index => {
+                document.querySelector(`.boggle-cell[data-index='${index}']`).classList.add('highlight');
+            });
+        }
     }
 
     // Handle cell click
@@ -110,6 +119,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 score += (10 + word.length - 3) * 1.5; // 1.5x multiplier
                 scoreDisplay.textContent = `Score: ${Math.round(score)}`;
                 wordListDisplay.textContent = `Words Found: ${Array.from(wordsFound).join(', ')}`;
+                updateMultiplayerScore(word.length);
             } else {
                 alert('Word already found.');
             }
@@ -119,6 +129,27 @@ document.addEventListener("DOMContentLoaded", () => {
         wordInput.value = '';
         selectedCells = [];
         highlightCells([], true);
+    }
+
+    // Update multiplayer score
+    function updateMultiplayerScore(wordLength) {
+        if (multiplayer) {
+            const points = (10 + wordLength - 3) * 1.5;
+            if (currentPlayer === 1) {
+                player1Score += points;
+                document.getElementById('player1-score').textContent = `Player 1 Score: ${Math.round(player1Score)}`;
+            } else {
+                player2Score += points;
+                document.getElementById('player2-score').textContent = `Player 2 Score: ${Math.round(player2Score)}`;
+            }
+            switchPlayer();
+        }
+    }
+
+    // Switch player
+    function switchPlayer() {
+        currentPlayer = currentPlayer === 1 ? 2 : 1;
+        document.getElementById('current-player').textContent = `Current Player: Player ${currentPlayer}`;
     }
 
     // Timer countdown
@@ -133,8 +164,24 @@ document.addEventListener("DOMContentLoaded", () => {
                 alert('Time is up!');
                 saveHighScore();
                 updateLeaderboard();
+                if (multiplayer) {
+                    determineWinner();
+                }
             }
         }, 1000);
+    }
+
+    // Determine multiplayer winner
+    function determineWinner() {
+        let winner;
+        if (player1Score > player2Score) {
+            winner = 'Player 1';
+        } else if (player2Score > player1Score) {
+            winner = 'Player 2';
+        } else {
+            winner = 'It\'s a tie!';
+        }
+        alert(`Game Over! Winner: ${winner}`);
     }
 
     // Save high score
@@ -254,6 +301,7 @@ document.addEventListener("DOMContentLoaded", () => {
             settingsSection.style.display = 'block';
             highscoresSection.style.display = 'block';
             leaderboardSection.style.display = 'block';
+            multiplayerSection.style.display = 'block';
             resetGame();
         }
     }
@@ -268,6 +316,8 @@ document.addEventListener("DOMContentLoaded", () => {
         settingsSection.style.display = 'none';
         highscoresSection.style.display = 'none';
         leaderboardSection.style.display = 'none';
+        multiplayerSection.style.display = 'none';
+        chatSection.style.display = 'none';
         clearInterval(timer);
         timerDisplay.textContent = 'Time Left: 0';
         scoreDisplay.textContent = 'Score: 0';
@@ -275,13 +325,58 @@ document.addEventListener("DOMContentLoaded", () => {
         wordInput.value = '';
     }
 
-    // Initialize
-    fetchDictionary();
+    // Handle multiplayer start
+    function handleMultiplayerStart() {
+        multiplayer = true;
+        player1Score = 0;
+        player2Score = 0;
+        currentPlayer = 1;
+        const multiplayerInfo = document.createElement('div');
+        multiplayerInfo.innerHTML = `
+            <div id="player1-score">Player 1 Score: 0</div>
+            <div id="player2-score">Player 2 Score: 0</div>
+            <div id="current-player">Current Player: Player 1</div>
+        `;
+        document.body.insertBefore(multiplayerInfo, board);
+        chatSection.style.display = 'block';
+        resetGame();
+    }
+
+    // Handle chat message
+    function handleChatMessage() {
+        const message = chatInput.value.trim();
+        if (message) {
+            chatMessages.push({ username: currentUser, message });
+            updateChatWindow();
+            chatInput.value = '';
+        }
+    }
+
+    // Update chat window
+    function updateChatWindow() {
+        chatWindow.innerHTML = '';
+        chatMessages.forEach(msg => {
+            const msgDiv = document.createElement('div');
+            msgDiv.textContent = `${msg.username}: ${msg.message}`;
+            chatWindow.appendChild(msgDiv);
+        });
+    }
+
+    // Event listeners
+    submitButton.addEventListener('click', handleWordSubmit);
+    resetButton.addEventListener('click', resetGame);
+    hintButton.addEventListener('click', handleHint);
     difficultySelect.addEventListener('change', handleDifficultyChange);
     themeSwitch.addEventListener('change', handleThemeChange);
     loginButton.addEventListener('click', handleLogin);
     logoutButton.addEventListener('click', handleLogout);
-    submitButton.addEventListener('click', handleWordSubmit);
-    resetButton.addEventListener('click', resetGame);
-    hintButton.addEventListener('click', handleHint);
+    sendChatButton.addEventListener('click', handleChatMessage);
+    startMultiplayerButton.addEventListener('click', handleMultiplayerStart);
+
+    // Initial setup
+    fetchDictionary();
+    handleDifficultyChange();
+    handleThemeChange();
+    updateHighScoresList();
+    displayLeaderboard();
 });
