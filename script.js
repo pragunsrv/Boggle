@@ -17,32 +17,26 @@ document.addEventListener("DOMContentLoaded", () => {
     const profileAvgScoreDisplay = document.getElementById('profile-avgscore');
     const profileWordsFoundDisplay = document.getElementById('profile-wordsfound');
     const profileGamesPlayedDisplay = document.getElementById('profile-gamesplayed');
+    const profileAchievementsDisplay = document.getElementById('profile-achievements');
     const highscoresList = document.getElementById('highscores-list');
     const leaderboardList = document.getElementById('leaderboard-list');
     const chatWindow = document.getElementById('chat-window');
     const chatInput = document.getElementById('chat-input');
     const sendChatButton = document.getElementById('send-chat');
-    const multiplayerSection = document.getElementById('multiplayer-section');
     const startMultiplayerButton = document.getElementById('start-multiplayer');
     const createLobbyButton = document.getElementById('create-lobby');
     const joinLobbyButton = document.getElementById('join-lobby');
     const lobbyList = document.getElementById('lobby-list');
+    const aiHintButton = document.getElementById('get-ai-hint');
+    const createCustomBoardButton = document.getElementById('create-custom-board');
+    const shareCustomChallengesButton = document.getElementById('share-custom-challenges');
     const multiplayerInfo = document.getElementById('multiplayer-info');
-    const player1ScoreDisplay = document.getElementById('player1-score');
-    const player2ScoreDisplay = document.getElementById('player2-score');
     const currentPlayerDisplay = document.getElementById('current-player');
-    const bgColorInput = document.getElementById('bg-color');
-    const fontColorInput = document.getElementById('font-color');
-    const cellSizeInput = document.getElementById('cell-size');
-    const themeSwitch = document.getElementById('theme-switch');
-    const gameModesSection = document.getElementById('game-modes-section');
-    const speedChallengeButton = document.getElementById('speed-challenge');
-    const endlessModeButton = document.getElementById('endless-mode');
-    const customChallengesButton = document.getElementById('custom-challenges');
-    const arSection = document.getElementById('ar-section');
     const startARButton = document.getElementById('start-ar');
+    const arSection = document.getElementById('ar-section');
     const tutorialSection = document.getElementById('tutorial-section');
     const closeTutorialButton = document.getElementById('close-tutorial');
+    const boardLayoutSelect = document.getElementById('board-layout');
 
     let boardSize = 4;
     let timeLimit = 60;
@@ -57,7 +51,8 @@ document.addEventListener("DOMContentLoaded", () => {
     let userStats = {
         totalWordsFound: 0,
         gamesPlayed: 0,
-        totalScore: 0
+        totalScore: 0,
+        achievements: []
     };
     let multiplayer = false;
     let player1Score = 0;
@@ -69,7 +64,6 @@ document.addEventListener("DOMContentLoaded", () => {
     let highScores = JSON.parse(localStorage.getItem('highScores')) || [];
     let leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || [];
 
-    // Fetch dictionary from a text file or online source
     function fetchDictionary() {
         fetch('dictionary.txt')
             .then(response => response.text())
@@ -78,20 +72,18 @@ document.addEventListener("DOMContentLoaded", () => {
             });
     }
 
-    // Generate random letters for the board
     function generateRandomLetters(size) {
         const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
         return Array.from({ length: size * size }, () => letters[Math.floor(Math.random() * letters.length)]);
     }
 
-    // Create Boggle board
     function createBoard() {
         board.innerHTML = '';
         board.style.gridTemplateColumns = `repeat(${boardSize}, ${cellSizeInput.value}px)`;
         boardLetters = generateRandomLetters(boardSize);
         boardLetters.forEach((letter, index) => {
             const cell = document.createElement('div');
-            cell.className = 'boggle-cell';
+            cell.className = `boggle-cell ${boardLayoutSelect.value}-board`;
             cell.textContent = letter;
             cell.dataset.index = index;
             cell.style.width = `${cellSizeInput.value}px`;
@@ -101,12 +93,10 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Check if the word is valid
     function checkWord(word) {
         return dictionary.has(word.toUpperCase());
     }
 
-    // Highlight selected cells
     function highlightCells(cells, clear = false) {
         document.querySelectorAll('.boggle-cell').forEach(cell => {
             cell.classList.remove('highlight');
@@ -118,7 +108,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Handle cell click
     function handleCellClick(event) {
         const cell = event.target;
         const index = parseInt(cell.dataset.index);
@@ -129,14 +118,12 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Handle word submission
     function handleWordSubmit() {
         const word = wordInput.value;
         if (word.length >= 3 && checkWord(word)) {
             if (!wordsFound.has(word)) {
                 wordsFound.add(word);
-                // Scoring with multiplier: 10 points per letter
-                score += (10 + word.length - 3) * 1.5; // 1.5x multiplier
+                score += (10 + word.length - 3) * 1.5;
                 scoreDisplay.textContent = `Score: ${Math.round(score)}`;
                 wordListDisplay.textContent = `Words Found: ${Array.from(wordsFound).join(', ')}`;
                 updateUserStats(word.length);
@@ -152,7 +139,6 @@ document.addEventListener("DOMContentLoaded", () => {
         highlightCells([], true);
     }
 
-    // Update user stats
     function updateUserStats(wordLength) {
         userStats.totalWordsFound++;
         userStats.totalScore += (10 + wordLength - 3) * 1.5;
@@ -160,9 +146,10 @@ document.addEventListener("DOMContentLoaded", () => {
         profileAvgScoreDisplay.textContent = (userStats.totalScore / userStats.gamesPlayed).toFixed(2);
         profileWordsFoundDisplay.textContent = userStats.totalWordsFound;
         profileGamesPlayedDisplay.textContent = userStats.gamesPlayed;
+        saveUserStats();
+        checkAchievements();
     }
 
-    // Update multiplayer score
     function updateMultiplayerScore(wordLength) {
         if (multiplayer) {
             const points = (10 + wordLength - 3) * 1.5;
@@ -177,13 +164,11 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Switch player
     function switchPlayer() {
         currentPlayer = currentPlayer === 1 ? 2 : 1;
         currentPlayerDisplay.textContent = `Current Player: Player ${currentPlayer}`;
     }
 
-    // Timer countdown
     function startTimer() {
         timeLeft = timeLimit;
         timerDisplay.textContent = `Time Left: ${timeLeft}`;
@@ -204,7 +189,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }, 1000);
     }
 
-    // Determine multiplayer winner
     function determineWinner() {
         let winner;
         if (player1Score > player2Score) {
@@ -217,7 +201,6 @@ document.addEventListener("DOMContentLoaded", () => {
         alert(`Game Over! Winner: ${winner}`);
     }
 
-    // Save high score
     function saveHighScore() {
         if (currentUser) {
             const existingHighscore = highScores.find(score => score.username === currentUser);
@@ -233,7 +216,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Update high scores list
     function updateHighScoresList() {
         highscoresList.innerHTML = '';
         highScores.sort((a, b) => b.score - a.score).forEach(score => {
@@ -243,7 +225,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Update leaderboard
     function updateLeaderboard() {
         const existingEntry = leaderboard.find(entry => entry.username === currentUser);
         if (!existingEntry || score > existingEntry.score) {
@@ -257,7 +238,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Display leaderboard
     function displayLeaderboard() {
         leaderboardList.innerHTML = '';
         leaderboard.sort((a, b) => b.score - a.score).forEach(entry => {
@@ -267,7 +247,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Reset game
     function resetGame() {
         clearInterval(timer);
         timeLeft = timeLimit;
@@ -283,7 +262,6 @@ document.addEventListener("DOMContentLoaded", () => {
         aiWords = [];
     }
 
-    // Handle difficulty change
     function handleDifficultyChange() {
         const difficulty = difficultySelect.value;
         switch (difficulty) {
@@ -303,12 +281,10 @@ document.addEventListener("DOMContentLoaded", () => {
         resetGame();
     }
 
-    // Handle theme change
     function handleThemeChange() {
         document.body.className = themeSwitch.value;
     }
 
-    // Handle hint
     function handleHint() {
         const hintWords = Array.from(dictionary).filter(word => word.length >= 3 && word.length <= boardSize);
         if (hintWords.length > 0) {
@@ -319,7 +295,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Handle login
     function handleLogin() {
         const username = usernameInput.value.trim();
         if (username) {
@@ -337,13 +312,14 @@ document.addEventListener("DOMContentLoaded", () => {
             gameModesSection.style.display = 'block';
             arSection.style.display = 'block';
             tutorialSection.style.display = 'block';
+            aiSection.style.display = 'block';
+            ugcSection.style.display = 'block';
             loadUserStats();
             createBoard();
             startTimer();
         }
     }
 
-    // Handle logout
     function handleLogout() {
         currentUser = null;
         authSection.style.display = 'block';
@@ -357,10 +333,11 @@ document.addEventListener("DOMContentLoaded", () => {
         gameModesSection.style.display = 'none';
         arSection.style.display = 'none';
         tutorialSection.style.display = 'none';
+        aiSection.style.display = 'none';
+        ugcSection.style.display = 'none';
         resetGame();
     }
 
-    // Load user stats
     function loadUserStats() {
         const savedStats = JSON.parse(localStorage.getItem('userStats')) || {};
         if (savedStats[currentUser]) {
@@ -369,10 +346,10 @@ document.addEventListener("DOMContentLoaded", () => {
             profileAvgScoreDisplay.textContent = stats.avgScore || 0;
             profileWordsFoundDisplay.textContent = stats.totalWordsFound || 0;
             profileGamesPlayedDisplay.textContent = stats.gamesPlayed || 0;
+            profileAchievementsDisplay.textContent = stats.achievements.join(', ') || 'None';
         }
     }
 
-    // Save user stats
     function saveUserStats() {
         const savedStats = JSON.parse(localStorage.getItem('userStats')) || {};
         if (!savedStats[currentUser]) {
@@ -380,7 +357,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 highScore: 0,
                 avgScore: 0,
                 totalWordsFound: 0,
-                gamesPlayed: 0
+                gamesPlayed: 0,
+                achievements: []
             };
         }
         const stats = savedStats[currentUser];
@@ -388,10 +366,21 @@ document.addEventListener("DOMContentLoaded", () => {
         stats.gamesPlayed += userStats.gamesPlayed;
         stats.avgScore = (stats.avgScore * (stats.gamesPlayed - 1) + (score / userStats.gamesPlayed)) / stats.gamesPlayed;
         stats.highScore = Math.max(stats.highScore, score);
+        stats.achievements = [...new Set([...stats.achievements, ...userStats.achievements])];
         localStorage.setItem('userStats', JSON.stringify(savedStats));
     }
 
-    // Handle chat message
+    function checkAchievements() {
+        // Example achievement checks
+        if (userStats.totalWordsFound > 50 && !userStats.achievements.includes('Word Master')) {
+            userStats.achievements.push('Word Master');
+        }
+        if (score > 1000 && !userStats.achievements.includes('High Scorer')) {
+            userStats.achievements.push('High Scorer');
+        }
+        saveUserStats();
+    }
+
     function handleChatMessage() {
         const message = chatInput.value.trim();
         if (message) {
@@ -401,7 +390,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Update chat window
     function updateChatWindow() {
         chatWindow.innerHTML = '';
         chatMessages.forEach(msg => {
@@ -411,7 +399,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Handle multiplayer start
     function handleMultiplayerStart() {
         multiplayer = true;
         player1Score = 0;
@@ -422,31 +409,23 @@ document.addEventListener("DOMContentLoaded", () => {
         resetGame();
     }
 
-    // Handle lobby creation
     function handleLobbyCreation() {
-        // Example code for creating a lobby
         const lobbyName = prompt('Enter a name for the lobby:');
         if (lobbyName) {
-            // Add lobby to the lobby list
             const li = document.createElement('li');
             li.textContent = lobbyName;
             lobbyList.appendChild(li);
         }
     }
 
-    // Handle joining a lobby
     function handleLobbyJoin() {
-        // Example code for joining a lobby
         const selectedLobby = prompt('Enter the name of the lobby to join:');
         if (selectedLobby) {
-            // Join the selected lobby
             alert(`Joined lobby: ${selectedLobby}`);
         }
     }
 
-    // AI opponent logic
     function aiPlay() {
-        // Simulate AI finding words
         aiWords = Array.from(dictionary).filter(word => word.length >= 3 && word.length <= boardSize);
         if (aiWords.length > 0) {
             const aiScore = aiWords.reduce((total, word) => total + (10 + word.length - 3) * 1.5, 0);
@@ -456,13 +435,10 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // AR mode
     function startAR() {
-        // Example code for AR
         alert('AR Mode is not implemented. This is a placeholder.');
     }
 
-    // Handle game mode selection
     function handleGameModeSelection(mode) {
         switch (mode) {
             case 'speed-challenge':
@@ -474,14 +450,26 @@ document.addEventListener("DOMContentLoaded", () => {
                 timeLimit = Infinity;
                 break;
             case 'custom-challenges':
-                // Custom challenges implementation
                 alert('Custom Challenges is a placeholder.');
                 return;
         }
         resetGame();
     }
 
-    // Event listeners
+    function handleUserContentCreation() {
+        // Placeholder for creating custom boards and challenges
+        alert('User-Generated Content is a placeholder.');
+    }
+
+    function handleAIHint() {
+        if (aiWords.length > 0) {
+            const hintWord = aiWords[Math.floor(Math.random() * aiWords.length)];
+            alert(`AI Hint: Try the word "${hintWord}"`);
+        } else {
+            alert('AI could not generate a hint.');
+        }
+    }
+
     submitButton.addEventListener('click', handleWordSubmit);
     resetButton.addEventListener('click', resetGame);
     hintButton.addEventListener('click', handleHint);
@@ -494,12 +482,14 @@ document.addEventListener("DOMContentLoaded", () => {
     createLobbyButton.addEventListener('click', handleLobbyCreation);
     joinLobbyButton.addEventListener('click', handleLobbyJoin);
     startARButton.addEventListener('click', startAR);
+    aiHintButton.addEventListener('click', handleAIHint);
+    createCustomBoardButton.addEventListener('click', handleUserContentCreation);
+    shareCustomChallengesButton.addEventListener('click', handleUserContentCreation);
     speedChallengeButton.addEventListener('click', () => handleGameModeSelection('speed-challenge'));
     endlessModeButton.addEventListener('click', () => handleGameModeSelection('endless-mode'));
     customChallengesButton.addEventListener('click', () => handleGameModeSelection('custom-challenges'));
     closeTutorialButton.addEventListener('click', () => tutorialSection.style.display = 'none');
 
-    // Initial setup
     fetchDictionary();
     handleDifficultyChange();
     handleThemeChange();
