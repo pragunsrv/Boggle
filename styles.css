@@ -3,17 +3,12 @@ body {
     text-align: center;
 }
 
-#instructions {
-    margin: 20px;
-    font-size: 16px;
-}
-
 #boggle-board {
     display: grid;
     grid-template-columns: repeat(4, 50px);
     grid-gap: 5px;
     margin: 20px auto;
-    max-width: 250px;
+    max-width: 300px;
 }
 
 .boggle-cell {
@@ -68,7 +63,11 @@ label {
     margin: 5px;
 }
 
-input[type="number"], select {
+input[type="number"], select, input[type="text"] {
     font-size: 16px;
     margin: 5px;
+}
+
+#auth-section, #user-section, #profile-section, #difficulty-section, #highscores-section {
+    margin: 20px;
 }

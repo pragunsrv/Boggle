@@ -3,29 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Boggle Game - Version 5</title>
+    <title>Boggle Game - Version 6</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Boggle Game - Version 5</h1>
-    <div id="instructions">
-        <h2>Instructions</h2>
-        <p>1. Click on letters to form a word.</p>
-        <p>2. Words must be at least 3 letters long.</p>
-        <p>3. Words must be valid and appear in the board.</p>
-        <p>4. The score increases with longer words and is multiplied based on length.</p>
+    <h1>Boggle Game - Version 6</h1>
+    
+    <div id="auth-section">
+        <h2>Login</h2>
+        <input type="text" id="username" placeholder="Enter username">
+        <button id="login-button">Login</button>
     </div>
-    <div>
-        <label for="board-size">Board Size:</label>
-        <select id="board-size">
-            <option value="4">4x4</option>
-            <option value="5">5x5</option>
+
+    <div id="user-section" style="display: none;">
+        <h2>Welcome, <span id="user-name"></span>!</h2>
+        <button id="logout-button">Logout</button>
+    </div>
+
+    <div id="profile-section" style="display: none;">
+        <h2>User Profile</h2>
+        <p>Username: <span id="profile-username"></span></p>
+        <p>High Score: <span id="profile-highscore">0</span></p>
+    </div>
+
+    <div id="difficulty-section" style="display: none;">
+        <label for="difficulty">Difficulty Level:</label>
+        <select id="difficulty">
+            <option value="easy">Easy (4x4, 60s)</option>
+            <option value="medium">Medium (5x5, 90s)</option>
+            <option value="hard">Hard (6x6, 120s)</option>
         </select>
     </div>
-    <div>
-        <label for="timer-length">Timer (seconds):</label>
-        <input type="number" id="timer-length" value="60" min="10">
-    </div>
+
     <div id="boggle-board"></div>
     <input type="text" id="word-input" placeholder="Enter word">
     <button id="submit-word">Submit</button>
@@ -33,6 +42,11 @@
     <div id="score">Score: 0</div>
     <div id="word-list">Words Found: </div>
     <div id="timer">Time Left: 60</div>
+    <div id="highscores-section" style="display: none;">
+        <h2>High Scores</h2>
+        <ul id="highscores-list"></ul>
+    </div>
+    
     <script src="script.js"></script>
 </body>
 </html>
