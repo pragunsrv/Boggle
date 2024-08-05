@@ -81,6 +81,16 @@ input[type="number"], select, input[type="text"], input[type="checkbox"] {
     padding: 5px;
 }
 
+#multiplayer-info {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+#player1-score, #player2-score, #current-player {
+    margin: 0 10px;
+}
+
 body.light {
     background-color: white;
     color: black;

@@ -31,36 +31,40 @@ document.addEventListener("DOMContentLoaded", () => {
     const sendChatButton = document.getElementById('send-chat');
     const multiplayerSection = document.getElementById('multiplayer-section');
     const startMultiplayerButton = document.getElementById('start-multiplayer');
-    
+    const multiplayerInfo = document.getElementById('multiplayer-info');
+    const player1ScoreDisplay = document.getElementById('player1-score');
+    const player2ScoreDisplay = document.getElementById('player2-score');
+    const currentPlayerDisplay = document.getElementById('current-player');
+
     let score = 0;
     let boardSize = 4;
     let timeLimit = 60;
     let boardLetters = [];
     let wordsFound = new Set();
-    let timer;
-    let timeLeft;
     let selectedCells = [];
-    let currentUser = null;
+    let timeLeft;
+    let timer;
+    let currentUser;
     let highScores = JSON.parse(localStorage.getItem('highScores')) || [];
     let leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || [];
+    let chatMessages = [];
     let multiplayer = false;
     let player1Score = 0;
     let player2Score = 0;
     let currentPlayer = 1;
-    let chatMessages = [];
+    const dictionary = new Set();
+    let aiWords = [];
 
-    // Fetch dictionary data
-    async function fetchDictionary() {
-        try {
-            const response = await fetch('path/to/your/wordlist.txt');
-            const text = await response.text();
-            dictionary = new Set(text.split('\n').map(word => word.trim().toUpperCase()));
-        } catch (error) {
-            console.error('Error fetching dictionary:', error);
-        }
+    // Fetch dictionary from a text file or online source
+    function fetchDictionary() {
+        fetch('dictionary.txt')
+            .then(response => response.text())
+            .then(text => {
+                text.split('\n').forEach(word => dictionary.add(word.trim().toUpperCase()));
+            });
     }
 
-    // Generate random letters
+    // Generate random letters for the board
     function generateRandomLetters(size) {
         const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
         return Array.from({ length: size * size }, () => letters[Math.floor(Math.random() * letters.length)]);
@@ -137,10 +141,10 @@ document.addEventListener("DOMContentLoaded", () => {
             const points = (10 + wordLength - 3) * 1.5;
             if (currentPlayer === 1) {
                 player1Score += points;
-                document.getElementById('player1-score').textContent = `Player 1 Score: ${Math.round(player1Score)}`;
+                player1ScoreDisplay.textContent = `Player 1 Score: ${Math.round(player1Score)}`;
             } else {
                 player2Score += points;
-                document.getElementById('player2-score').textContent = `Player 2 Score: ${Math.round(player2Score)}`;
+                player2ScoreDisplay.textContent = `Player 2 Score: ${Math.round(player2Score)}`;
             }
             switchPlayer();
         }
@@ -149,7 +153,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Switch player
     function switchPlayer() {
         currentPlayer = currentPlayer === 1 ? 2 : 1;
-        document.getElementById('current-player').textContent = `Current Player: Player ${currentPlayer}`;
+        currentPlayerDisplay.textContent = `Current Player: Player ${currentPlayer}`;
     }
 
     // Timer countdown
@@ -166,6 +170,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 updateLeaderboard();
                 if (multiplayer) {
                     determineWinner();
+                } else {
+                    aiPlay();
                 }
             }
         }, 1000);
@@ -247,6 +253,7 @@ document.addEventListener("DOMContentLoaded", () => {
         selectedCells = [];
         createBoard();
         startTimer();
+        aiWords = [];
     }
 
     // Handle difficulty change
@@ -280,9 +287,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Handle hint
     function handleHint() {
-        const hints = Array.from(dictionary).filter(word => word.length >= 3);
-        const hint = hints[Math.floor(Math.random() * hints.length)];
-        alert(`Try this word: ${hint}`);
+        if (aiWords.length === 0) {
+            aiPlay();
+        }
+        if (aiWords.length > 0) {
+            const hint = aiWords[Math.floor(Math.random() * aiWords.length)];
+            alert(`Try this word: ${hint}`);
+        } else {
+            alert('No hints available.');
+        }
     }
 
     // Handle login
@@ -318,28 +331,8 @@ document.addEventListener("DOMContentLoaded", () => {
         leaderboardSection.style.display = 'none';
         multiplayerSection.style.display = 'none';
         chatSection.style.display = 'none';
+        multiplayerInfo.style.display = 'none';
         clearInterval(timer);
-        timerDisplay.textContent = 'Time Left: 0';
-        scoreDisplay.textContent = 'Score: 0';
-        wordListDisplay.textContent = 'Words Found: ';
-        wordInput.value = '';
-    }
-
-    // Handle multiplayer start
-    function handleMultiplayerStart() {
-        multiplayer = true;
-        player1Score = 0;
-        player2Score = 0;
-        currentPlayer = 1;
-        const multiplayerInfo = document.createElement('div');
-        multiplayerInfo.innerHTML = `
-            <div id="player1-score">Player 1 Score: 0</div>
-            <div id="player2-score">Player 2 Score: 0</div>
-            <div id="current-player">Current Player: Player 1</div>
-        `;
-        document.body.insertBefore(multiplayerInfo, board);
-        chatSection.style.display = 'block';
-        resetGame();
     }
 
     // Handle chat message
@@ -360,6 +353,29 @@ document.addEventListener("DOMContentLoaded", () => {
             msgDiv.textContent = `${msg.username}: ${msg.message}`;
             chatWindow.appendChild(msgDiv);
         });
+    }
+
+    // Handle multiplayer start
+    function handleMultiplayerStart() {
+        multiplayer = true;
+        player1Score = 0;
+        player2Score = 0;
+        currentPlayer = 1;
+        multiplayerInfo.style.display = 'flex';
+        currentPlayerDisplay.textContent = `Current Player: Player ${currentPlayer}`;
+        resetGame();
+    }
+
+    // AI opponent logic
+    function aiPlay() {
+        // Simulate AI finding words
+        aiWords = Array.from(dictionary).filter(word => word.length >= 3 && word.length <= boardSize);
+        if (aiWords.length > 0) {
+            const aiScore = aiWords.reduce((total, word) => total + (10 + word.length - 3) * 1.5, 0);
+            alert(`AI found ${aiWords.length} words and scored ${Math.round(aiScore)} points.`);
+        } else {
+            alert('AI could not find any words.');
+        }
     }
 
     // Event listeners

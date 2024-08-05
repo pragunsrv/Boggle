@@ -45,22 +45,8 @@
         <input type="checkbox" id="sound-toggle">
     </div>
 
-    <div id="daily-challenge-section" style="display: none;">
-        <h2>Daily Challenge</h2>
-        <p>Complete the daily puzzle and earn rewards!</p>
-        <button id="start-daily-challenge">Start Daily Challenge</button>
-    </div>
-
-    <div id="achievements-section" style="display: none;">
-        <h2>Achievements</h2>
-        <ul id="achievements-list"></ul>
-    </div>
-
-    <div id="statistics-section" style="display: none;">
-        <h2>Game Statistics</h2>
-        <p>Total Games Played: <span id="total-games">0</span></p>
-        <p>Total Words Found: <span id="total-words">0</span></p>
-        <p>Average Score: <span id="average-score">0</span></p>
+    <div id="multiplayer-section" style="display: none;">
+        <button id="start-multiplayer">Start Multiplayer Game</button>
     </div>
 
     <div id="boggle-board"></div>
@@ -71,5 +57,30 @@
     <div id="score">Score: 0</div>
     <div id="word-list">Words Found: </div>
     <div id="timer">Time Left: 60</div>
+
     <div id="highscores-section" style="display: none;">
         <h2>High Scores</h2>
+        <ul id="highscores-list"></ul>
+    </div>
+
+    <div id="leaderboard-section" style="display: none;">
+        <h2>Global Leaderboard</h2>
+        <ul id="leaderboard-list"></ul>
+    </div>
+
+    <div id="chat-section" style="display: none;">
+        <h2>Chat</h2>
+        <div id="chat-window"></div>
+        <input type="text" id="chat-input" placeholder="Type a message">
+        <button id="send-chat">Send</button>
+    </div>
+
+    <div id="multiplayer-info" style="display: none;">
+        <div id="player1-score">Player 1 Score: 0</div>
+        <div id="player2-score">Player 2 Score: 0</div>
+        <div id="current-player">Current Player: Player 1</div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
