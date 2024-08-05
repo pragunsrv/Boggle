@@ -14,6 +14,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const userNameDisplay = document.getElementById('user-name');
     const profileUsernameDisplay = document.getElementById('profile-username');
     const profileHighscoreDisplay = document.getElementById('profile-highscore');
+    const profileAvgScoreDisplay = document.getElementById('profile-avgscore');
+    const profileWordsFoundDisplay = document.getElementById('profile-wordsfound');
+    const profileGamesPlayedDisplay = document.getElementById('profile-gamesplayed');
     const highscoresList = document.getElementById('highscores-list');
     const leaderboardList = document.getElementById('leaderboard-list');
     const themeSwitch = document.getElementById('theme-switch');
@@ -31,29 +34,33 @@ document.addEventListener("DOMContentLoaded", () => {
     const sendChatButton = document.getElementById('send-chat');
     const multiplayerSection = document.getElementById('multiplayer-section');
     const startMultiplayerButton = document.getElementById('start-multiplayer');
+    const invitePlayerButton = document.getElementById('invite-player');
+    const playerList = document.getElementById('player-list');
     const multiplayerInfo = document.getElementById('multiplayer-info');
     const player1ScoreDisplay = document.getElementById('player1-score');
     const player2ScoreDisplay = document.getElementById('player2-score');
     const currentPlayerDisplay = document.getElementById('current-player');
 
-    let score = 0;
     let boardSize = 4;
     let timeLimit = 60;
-    let boardLetters = [];
-    let wordsFound = new Set();
     let selectedCells = [];
     let timeLeft;
     let timer;
+    let score = 0;
+    let wordsFound = new Set();
+    let boardLetters = [];
+    let dictionary = new Set();
     let currentUser;
-    let highScores = JSON.parse(localStorage.getItem('highScores')) || [];
-    let leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || [];
-    let chatMessages = [];
+    let userStats = {
+        totalWordsFound: 0,
+        gamesPlayed: 0,
+        totalScore: 0
+    };
     let multiplayer = false;
     let player1Score = 0;
     let player2Score = 0;
     let currentPlayer = 1;
-    const dictionary = new Set();
-    let aiWords = [];
+    let playerQueue = [];
 
     // Fetch dictionary from a text file or online source
     function fetchDictionary() {
@@ -123,6 +130,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 score += (10 + word.length - 3) * 1.5; // 1.5x multiplier
                 scoreDisplay.textContent = `Score: ${Math.round(score)}`;
                 wordListDisplay.textContent = `Words Found: ${Array.from(wordsFound).join(', ')}`;
+                updateUserStats(word.length);
                 updateMultiplayerScore(word.length);
             } else {
                 alert('Word already found.');
@@ -133,6 +141,16 @@ document.addEventListener("DOMContentLoaded", () => {
         wordInput.value = '';
         selectedCells = [];
         highlightCells([], true);
+    }
+
+    // Update user stats
+    function updateUserStats(wordLength) {
+        userStats.totalWordsFound++;
+        userStats.totalScore += (10 + wordLength - 3) * 1.5;
+        userStats.gamesPlayed++;
+        profileAvgScoreDisplay.textContent = (userStats.totalScore / userStats.gamesPlayed).toFixed(2);
+        profileWordsFoundDisplay.textContent = userStats.totalWordsFound;
+        profileGamesPlayedDisplay.textContent = userStats.gamesPlayed;
     }
 
     // Update multiplayer score
@@ -305,17 +323,18 @@ document.addEventListener("DOMContentLoaded", () => {
             currentUser = username;
             userNameDisplay.textContent = currentUser;
             profileUsernameDisplay.textContent = currentUser;
-            const userHighscore = highScores.find(score => score.username === currentUser);
-            profileHighscoreDisplay.textContent = userHighscore ? userHighscore.score : '0';
             authSection.style.display = 'none';
             userSection.style.display = 'block';
             profileSection.style.display = 'block';
             difficultySection.style.display = 'block';
             settingsSection.style.display = 'block';
+            chatSection.style.display = 'block';
+            multiplayerSection.style.display = 'block';
             highscoresSection.style.display = 'block';
             leaderboardSection.style.display = 'block';
-            multiplayerSection.style.display = 'block';
-            resetGame();
+            loadUserStats();
+            createBoard();
+            startTimer();
         }
     }
 
@@ -327,12 +346,42 @@ document.addEventListener("DOMContentLoaded", () => {
         profileSection.style.display = 'none';
         difficultySection.style.display = 'none';
         settingsSection.style.display = 'none';
+        chatSection.style.display = 'none';
+        multiplayerSection.style.display = 'none';
         highscoresSection.style.display = 'none';
         leaderboardSection.style.display = 'none';
-        multiplayerSection.style.display = 'none';
-        chatSection.style.display = 'none';
-        multiplayerInfo.style.display = 'none';
-        clearInterval(timer);
+        resetGame();
+    }
+
+    // Load user stats
+    function loadUserStats() {
+        const savedStats = JSON.parse(localStorage.getItem('userStats')) || {};
+        if (savedStats[currentUser]) {
+            const stats = savedStats[currentUser];
+            profileHighscoreDisplay.textContent = stats.highScore || 0;
+            profileAvgScoreDisplay.textContent = stats.avgScore || 0;
+            profileWordsFoundDisplay.textContent = stats.totalWordsFound || 0;
+            profileGamesPlayedDisplay.textContent = stats.gamesPlayed || 0;
+        }
+    }
+
+    // Save user stats
+    function saveUserStats() {
+        const savedStats = JSON.parse(localStorage.getItem('userStats')) || {};
+        if (!savedStats[currentUser]) {
+            savedStats[currentUser] = {
+                highScore: 0,
+                avgScore: 0,
+                totalWordsFound: 0,
+                gamesPlayed: 0
+            };
+        }
+        const stats = savedStats[currentUser];
+        stats.totalWordsFound += userStats.totalWordsFound;
+        stats.gamesPlayed += userStats.gamesPlayed;
+        stats.avgScore = (stats.avgScore * (stats.gamesPlayed - 1) + (score / userStats.gamesPlayed)) / stats.gamesPlayed;
+        stats.highScore = Math.max(stats.highScore, score);
+        localStorage.setItem('userStats', JSON.stringify(savedStats));
     }
 
     // Handle chat message
@@ -366,6 +415,26 @@ document.addEventListener("DOMContentLoaded", () => {
         resetGame();
     }
 
+    // Handle player invitation
+    function handlePlayerInvitation() {
+        // Example code for inviting a player (implementation may vary)
+        const invitedPlayer = prompt('Enter username of player to invite:');
+        if (invitedPlayer) {
+            playerQueue.push(invitedPlayer);
+            updatePlayerList();
+        }
+    }
+
+    // Update player list
+    function updatePlayerList() {
+        playerList.innerHTML = '';
+        playerQueue.forEach(player => {
+            const li = document.createElement('li');
+            li.textContent = player;
+            playerList.appendChild(li);
+        });
+    }
+
     // AI opponent logic
     function aiPlay() {
         // Simulate AI finding words
@@ -388,6 +457,7 @@ document.addEventListener("DOMContentLoaded", () => {
     logoutButton.addEventListener('click', handleLogout);
     sendChatButton.addEventListener('click', handleChatMessage);
     startMultiplayerButton.addEventListener('click', handleMultiplayerStart);
+    invitePlayerButton.addEventListener('click', handlePlayerInvitation);
 
     // Initial setup
     fetchDictionary();
