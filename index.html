@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Boggle Game - Version 9</title>
+    <title>Boggle Game - Version 11</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Boggle Game - Version 9</h1>
+    <h1>Boggle Game - Version 11</h1>
 
     <div id="auth-section">
         <h2>Login</h2>
@@ -24,6 +24,19 @@
         <h2>User Profile</h2>
         <p>Username: <span id="profile-username"></span></p>
         <p>High Score: <span id="profile-highscore">0</span></p>
+        <p>Average Score: <span id="profile-avgscore">0</span></p>
+        <p>Total Words Found: <span id="profile-wordsfound">0</span></p>
+        <p>Games Played: <span id="profile-gamesplayed">0</span></p>
+    </div>
+
+    <div id="customization-section" style="display: none;">
+        <h2>Customize Your Game</h2>
+        <label for="bg-color">Background Color:</label>
+        <input type="color" id="bg-color" value="#ffffff">
+        <label for="font-color">Font Color:</label>
+        <input type="color" id="font-color" value="#000000">
+        <label for="cell-size">Cell Size (px):</label>
+        <input type="number" id="cell-size" min="30" max="100" value="50">
     </div>
 
     <div id="difficulty-section" style="display: none;">
@@ -47,6 +60,9 @@
 
     <div id="multiplayer-section" style="display: none;">
         <button id="start-multiplayer">Start Multiplayer Game</button>
+        <button id="create-lobby">Create Lobby</button>
+        <button id="join-lobby">Join Lobby</button>
+        <div id="lobby-list"></div>
     </div>
 
     <div id="boggle-board"></div>

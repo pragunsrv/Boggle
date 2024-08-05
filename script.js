@@ -19,27 +19,22 @@ document.addEventListener("DOMContentLoaded", () => {
     const profileGamesPlayedDisplay = document.getElementById('profile-gamesplayed');
     const highscoresList = document.getElementById('highscores-list');
     const leaderboardList = document.getElementById('leaderboard-list');
-    const themeSwitch = document.getElementById('theme-switch');
-    const soundToggle = document.getElementById('sound-toggle');
-    const authSection = document.getElementById('auth-section');
-    const userSection = document.getElementById('user-section');
-    const profileSection = document.getElementById('profile-section');
-    const difficultySection = document.getElementById('difficulty-section');
-    const settingsSection = document.getElementById('settings-section');
-    const highscoresSection = document.getElementById('highscores-section');
-    const leaderboardSection = document.getElementById('leaderboard-section');
-    const chatSection = document.getElementById('chat-section');
     const chatWindow = document.getElementById('chat-window');
     const chatInput = document.getElementById('chat-input');
     const sendChatButton = document.getElementById('send-chat');
     const multiplayerSection = document.getElementById('multiplayer-section');
     const startMultiplayerButton = document.getElementById('start-multiplayer');
-    const invitePlayerButton = document.getElementById('invite-player');
-    const playerList = document.getElementById('player-list');
+    const createLobbyButton = document.getElementById('create-lobby');
+    const joinLobbyButton = document.getElementById('join-lobby');
+    const lobbyList = document.getElementById('lobby-list');
     const multiplayerInfo = document.getElementById('multiplayer-info');
     const player1ScoreDisplay = document.getElementById('player1-score');
     const player2ScoreDisplay = document.getElementById('player2-score');
     const currentPlayerDisplay = document.getElementById('current-player');
+    const bgColorInput = document.getElementById('bg-color');
+    const fontColorInput = document.getElementById('font-color');
+    const cellSizeInput = document.getElementById('cell-size');
+    const themeSwitch = document.getElementById('theme-switch');
 
     let boardSize = 4;
     let timeLimit = 60;
@@ -61,6 +56,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let player2Score = 0;
     let currentPlayer = 1;
     let playerQueue = [];
+    let aiWords = [];
 
     // Fetch dictionary from a text file or online source
     function fetchDictionary() {
@@ -80,13 +76,15 @@ document.addEventListener("DOMContentLoaded", () => {
     // Create Boggle board
     function createBoard() {
         board.innerHTML = '';
-        board.style.gridTemplateColumns = `repeat(${boardSize}, 50px)`;
+        board.style.gridTemplateColumns = `repeat(${boardSize}, ${cellSizeInput.value}px)`;
         boardLetters = generateRandomLetters(boardSize);
         boardLetters.forEach((letter, index) => {
             const cell = document.createElement('div');
             cell.className = 'boggle-cell';
             cell.textContent = letter;
             cell.dataset.index = index;
+            cell.style.width = `${cellSizeInput.value}px`;
+            cell.style.height = `${cellSizeInput.value}px`;
             cell.addEventListener('click', handleCellClick);
             board.appendChild(cell);
         });
@@ -296,21 +294,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Handle theme change
     function handleThemeChange() {
-        const theme = themeSwitch.value;
-        document.body.className = theme;
-        document.querySelectorAll('.boggle-cell').forEach(cell => {
-            cell.className = `boggle-cell ${theme}`;
-        });
+        document.body.className = themeSwitch.value;
     }
 
     // Handle hint
     function handleHint() {
-        if (aiWords.length === 0) {
-            aiPlay();
-        }
-        if (aiWords.length > 0) {
-            const hint = aiWords[Math.floor(Math.random() * aiWords.length)];
-            alert(`Try this word: ${hint}`);
+        const hintWords = Array.from(dictionary).filter(word => word.length >= 3 && word.length <= boardSize);
+        if (hintWords.length > 0) {
+            const hintWord = hintWords[Math.floor(Math.random() * hintWords.length)];
+            alert(`Hint: Try the word "${hintWord}"`);
         } else {
             alert('No hints available.');
         }
@@ -326,6 +318,7 @@ document.addEventListener("DOMContentLoaded", () => {
             authSection.style.display = 'none';
             userSection.style.display = 'block';
             profileSection.style.display = 'block';
+            customizationSection.style.display = 'block';
             difficultySection.style.display = 'block';
             settingsSection.style.display = 'block';
             chatSection.style.display = 'block';
@@ -344,6 +337,7 @@ document.addEventListener("DOMContentLoaded", () => {
         authSection.style.display = 'block';
         userSection.style.display = 'none';
         profileSection.style.display = 'none';
+        customizationSection.style.display = 'none';
         difficultySection.style.display = 'none';
         settingsSection.style.display = 'none';
         chatSection.style.display = 'none';
@@ -415,24 +409,26 @@ document.addEventListener("DOMContentLoaded", () => {
         resetGame();
     }
 
-    // Handle player invitation
-    function handlePlayerInvitation() {
-        // Example code for inviting a player (implementation may vary)
-        const invitedPlayer = prompt('Enter username of player to invite:');
-        if (invitedPlayer) {
-            playerQueue.push(invitedPlayer);
-            updatePlayerList();
+    // Handle lobby creation
+    function handleLobbyCreation() {
+        // Example code for creating a lobby
+        const lobbyName = prompt('Enter a name for the lobby:');
+        if (lobbyName) {
+            // Add lobby to the lobby list
+            const li = document.createElement('li');
+            li.textContent = lobbyName;
+            lobbyList.appendChild(li);
         }
     }
 
-    // Update player list
-    function updatePlayerList() {
-        playerList.innerHTML = '';
-        playerQueue.forEach(player => {
-            const li = document.createElement('li');
-            li.textContent = player;
-            playerList.appendChild(li);
-        });
+    // Handle joining a lobby
+    function handleLobbyJoin() {
+        // Example code for joining a lobby
+        const selectedLobby = prompt('Enter the name of the lobby to join:');
+        if (selectedLobby) {
+            // Join the selected lobby
+            alert(`Joined lobby: ${selectedLobby}`);
+        }
     }
 
     // AI opponent logic
@@ -457,7 +453,8 @@ document.addEventListener("DOMContentLoaded", () => {
     logoutButton.addEventListener('click', handleLogout);
     sendChatButton.addEventListener('click', handleChatMessage);
     startMultiplayerButton.addEventListener('click', handleMultiplayerStart);
-    invitePlayerButton.addEventListener('click', handlePlayerInvitation);
+    createLobbyButton.addEventListener('click', handleLobbyCreation);
+    joinLobbyButton.addEventListener('click', handleLobbyJoin);
 
     // Initial setup
     fetchDictionary();
