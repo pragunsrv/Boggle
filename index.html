@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Boggle Game - Version 6</title>
+    <title>Boggle Game - Version 7</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Boggle Game - Version 6</h1>
-    
+    <h1>Boggle Game - Version 7</h1>
+
     <div id="auth-section">
         <h2>Login</h2>
         <input type="text" id="username" placeholder="Enter username">
@@ -35,16 +35,31 @@
         </select>
     </div>
 
+    <div id="settings-section" style="display: none;">
+        <label for="theme-switch">Theme:</label>
+        <select id="theme-switch">
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+        </select>
+        <label for="sound-toggle">Sound Effects:</label>
+        <input type="checkbox" id="sound-toggle">
+    </div>
+
     <div id="boggle-board"></div>
     <input type="text" id="word-input" placeholder="Enter word">
     <button id="submit-word">Submit</button>
     <button id="reset-game">Reset</button>
+    <button id="hint-button">Hint</button>
     <div id="score">Score: 0</div>
     <div id="word-list">Words Found: </div>
     <div id="timer">Time Left: 60</div>
     <div id="highscores-section" style="display: none;">
         <h2>High Scores</h2>
         <ul id="highscores-list"></ul>
+    </div>
+    <div id="leaderboard-section" style="display: none;">
+        <h2>Global Leaderboard</h2>
+        <ul id="leaderboard-list"></ul>
     </div>
     
     <script src="script.js"></script>

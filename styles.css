@@ -37,7 +37,7 @@ body {
     font-size: 16px;
 }
 
-#submit-word, #reset-game {
+#submit-word, #reset-game, #hint-button {
     padding: 10px;
     font-size: 16px;
     margin: 5px;
@@ -63,11 +63,29 @@ label {
     margin: 5px;
 }
 
-input[type="number"], select, input[type="text"] {
+input[type="number"], select, input[type="text"], input[type="checkbox"] {
     font-size: 16px;
     margin: 5px;
 }
 
-#auth-section, #user-section, #profile-section, #difficulty-section, #highscores-section {
+#auth-section, #user-section, #profile-section, #difficulty-section, #highscores-section, #leaderboard-section {
     margin: 20px;
+}
+
+body.light {
+    background-color: white;
+    color: black;
+}
+
+body.dark {
+    background-color: black;
+    color: white;
+}
+
+.boggle-cell.light {
+    background-color: lightgrey;
+}
+
+.boggle-cell.dark {
+    background-color: darkgrey;
 }
