@@ -129,3 +129,31 @@ body.dark {
     flex-direction: column;
     align-items: center;
 }
+/* Existing styles ... */
+
+#ai-section {
+    margin-top: 20px;
+}
+
+#ugc-section {
+    margin-top: 20px;
+}
+
+#ai-section, #ugc-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.hex-board .boggle-cell {
+    width: calc(50px * 1.1547); /* Approximate hexagon width */
+    height: 50px;
+    background: #f0f0f0;
+    border-radius: 50%;
+    display: inline-block;
+    margin: -8px 0;
+}
+
+.hex-board .boggle-cell:nth-child(even) {
+    margin-left: calc(50px * 0.57735); /* Offset for hexagon rows */
+}

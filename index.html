@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Boggle Game - Version 12</title>
+    <title>Boggle Game - Version 13</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Boggle Game - Version 12</h1>
+    <h1>Boggle Game - Version 13</h1>
 
     <div id="auth-section">
         <h2>Login</h2>
@@ -27,6 +27,7 @@
         <p>Average Score: <span id="profile-avgscore">0</span></p>
         <p>Total Words Found: <span id="profile-wordsfound">0</span></p>
         <p>Games Played: <span id="profile-gamesplayed">0</span></p>
+        <p>Achievements: <span id="profile-achievements"></span></p>
     </div>
 
     <div id="customization-section" style="display: none;">
@@ -37,6 +38,11 @@
         <input type="color" id="font-color" value="#000000">
         <label for="cell-size">Cell Size (px):</label>
         <input type="number" id="cell-size" min="30" max="100" value="50">
+        <label for="board-layout">Board Layout:</label>
+        <select id="board-layout">
+            <option value="square">Square</option>
+            <option value="hex">Hexagonal</option>
+        </select>
     </div>
 
     <div id="difficulty-section" style="display: none;">
@@ -72,6 +78,31 @@
         <button id="custom-challenges">Custom Challenges</button>
     </div>
 
+    <div id="ar-section" style="display: none;">
+        <h2>AR Mode</h2>
+        <button id="start-ar">Start AR View</button>
+    </div>
+
+    <div id="tutorial-section" style="display: none;">
+        <h2>Game Tutorial</h2>
+        <div id="tutorial-content">
+            <p>Welcome to Boggle! Here's how to play...</p>
+            <!-- Detailed tutorial content goes here -->
+        </div>
+        <button id="close-tutorial">Close Tutorial</button>
+    </div>
+
+    <div id="ai-section" style="display: none;">
+        <h2>AI Assistant</h2>
+        <button id="get-ai-hint">Get AI Hint</button>
+    </div>
+
+    <div id="ugc-section" style="display: none;">
+        <h2>User-Generated Content</h2>
+        <button id="create-custom-board">Create Custom Board</button>
+        <button id="share-custom-challenges">Share Custom Challenges</button>
+    </div>
+
     <div id="boggle-board"></div>
     <input type="text" id="word-input" placeholder="Enter word">
     <button id="submit-word">Submit</button>
@@ -102,20 +133,6 @@
         <div id="player1-score">Player 1 Score: 0</div>
         <div id="player2-score">Player 2 Score: 0</div>
         <div id="current-player">Current Player: Player 1</div>
-    </div>
-
-    <div id="ar-section" style="display: none;">
-        <h2>AR Mode</h2>
-        <button id="start-ar">Start AR View</button>
-    </div>
-
-    <div id="tutorial-section" style="display: none;">
-        <h2>Game Tutorial</h2>
-        <div id="tutorial-content">
-            <p>Welcome to Boggle! Here's how to play...</p>
-            <!-- Detailed tutorial content goes here -->
-        </div>
-        <button id="close-tutorial">Close Tutorial</button>
     </div>
 
     <script src="script.js"></script>
